@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "보카랑",
+    "slug": "vacarang",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F8F9FF"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vacarang.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F8F9FF"
+      },
+      "package": "com.vacarang.app",
+      "versionCode": 1,
+      "permissions": []
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["expo-font", ["expo-build-properties", {"android": {"compileSdkVersion": 35, "targetSdkVersion": 35, "buildToolsVersion": "35.0.0", "buildArchs": ["arm64-v8a"]}}]],
+    "updates": {
+      "url": "https://u.expo.dev/5dc97be5-abb4-444f-8aee-fa16d6821fc7"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5dc97be5-abb4-444f-8aee-fa16d6821fc7"
+      }
+    }
+  }
+}
