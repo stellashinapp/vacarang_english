@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "보카랑",
+    "name": "보카랑 잉글리쉬",
     "slug": "vacarang",
-    "version": "1.0.0",
-    "orientation": "portrait",
+    "version": "1.0.10",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -11,13 +11,16 @@
       "resizeMode": "contain",
       "backgroundColor": "#F8F9FF"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.vacarang.app",
+      "bundleIdentifier": "com.vacarang.english",
       "buildNumber": "1",
       "infoPlist": {
-        "CFBundleAllowMixedLocalizations": true
+        "CFBundleAllowMixedLocalizations": true,
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -25,20 +28,41 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#F8F9FF"
       },
-      "package": "com.vacarang.app",
-      "versionCode": 1,
-      "permissions": []
+      "package": "com.vacarang.english",
+      "versionCode": 11,
+      "permissions": [],
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "plugins": ["expo-font", ["expo-build-properties", {"android": {"compileSdkVersion": 35, "targetSdkVersion": 35, "buildToolsVersion": "35.0.0", "buildArchs": ["arm64-v8a"]}}]],
+    "plugins": [
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0",
+            "ndkVersion": "28.0.13004108",
+            "buildArchs": [
+              "arm64-v8a"
+            ],
+            "packagingOptions": {
+              "jniLibs": {
+                "useLegacyPackaging": false
+              }
+            }
+          }
+        }
+      ],
+      "@react-native-firebase/app"
+    ],
     "updates": {
       "url": "https://u.expo.dev/5dc97be5-abb4-444f-8aee-fa16d6821fc7"
     },
+    "newArchEnabled": false,
     "extra": {
       "eas": {
         "projectId": "5dc97be5-abb4-444f-8aee-fa16d6821fc7"
@@ -46,3 +70,4 @@
     }
   }
 }
+

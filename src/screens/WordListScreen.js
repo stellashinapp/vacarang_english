@@ -14,6 +14,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FONT, COLORS, SHADOW, RADIUS } from "../utils/theme";
 import { speak, capFirst } from "../utils/helpers";
+import { logWordListEnter } from "../services/analytics";
 
 const STUDY_KEY = (lv) => `studyProgress_Lv${lv}`;
 const MAX_CONTENT_WIDTH = 480;
@@ -31,6 +32,10 @@ export default function WordListScreen({
   const isWrongNote = mode === "wrongnote";
   const [filter, setFilter] = useState(isWrongNote ? "wrong" : "all");
   const [studyProgress, setStudyProgress] = useState({});
+
+  useEffect(() => {
+    logWordListEnter(mode);
+  }, [mode]);
 
   useEffect(() => {
     (async () => {

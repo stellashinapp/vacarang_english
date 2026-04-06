@@ -24,6 +24,7 @@ import {
   capFirst,
 } from "../utils/helpers";
 import { WORDS_L1 } from "../data/words";
+import { logGameComplete } from "../services/analytics";
 
 const N = 10;
 const MAX_CONTENT_WIDTH = 480;
@@ -49,6 +50,7 @@ export default function SpellGameScreen({
   const [wrongList, setWrongList] = useState([]);
   const [startTime, setStartTime] = useState(null);
   const inputRef = useRef(null);
+  const didLogComplete = useRef(false);
 
   const generate = useCallback(() => {
     const pool = words.length >= 4 ? words : WORDS_L1;
@@ -118,6 +120,13 @@ export default function SpellGameScreen({
   };
 
   if (ws.length === 0) return null;
+
+  useEffect(() => {
+    if (!done || didLogComplete.current || ws.length === 0) return;
+    didLogComplete.current = true;
+    const elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+    logGameComplete({ mode: 'spell', level, score, total: N, timeSeconds: elapsed });
+  }, [done, level, score, startTime, ws.length]);
 
   if (done) {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);

@@ -1,6 +1,7 @@
+
 // 레벨 선택 화면
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -16,6 +17,7 @@ const CARD_GRAD_START = "#5A4ABD";
 const CARD_GRAD_END = "#7B6BDF";
 import { LEVEL_INFO, getAllWordsForLevel } from "../data/words";
 import { GhostAnim, BounceAnim, SquirmAnim, BallBounceAnim, DriftAnim } from "../components/CharacterAnims";
+import { logLevelSelectEnter } from "../services/analytics";
 
 const CHAR_SIZE = 60;
 const CHAR_SIZE_MID = 72;
@@ -28,6 +30,10 @@ export default function LevelSelectScreen({
   onBack,
   attemptHistory,
 }) {
+  useEffect(() => {
+    logLevelSelectEnter();
+  }, []);
+
   const levels = LEVEL_INFO.map((l) => ({
     ...l,
     actual: getAllWordsForLevel(l.level).length,

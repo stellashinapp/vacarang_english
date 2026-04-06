@@ -10,6 +10,7 @@ import {
 import { FONT, COLORS, SHADOW } from '../utils/theme';
 import { shuffle, speak, sfxCorrect, sfxWrong, sfxRight, sfxDone, formatTime, getGrade, capFirst } from '../utils/helpers';
 import { WORDS_L1 } from '../data/words';
+import { logGameComplete } from '../services/analytics';
 
 const MAX_CONTENT_WIDTH = 480;
 const N = 10;
@@ -28,6 +29,7 @@ export default function QuizGameScreen({
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   const [startTime, setStartTime] = useState(null);
+  const didLogComplete = useRef(false);
   const [wrongList, setWrongList] = useState([]); // 이번 게임에서 틀린 단어
   const [totalAttempts, setTotalAttempts] = useState(0);
 
@@ -164,6 +166,14 @@ export default function QuizGameScreen({
 
   // 로딩 중
   if (questions.length === 0) return null;
+
+  // 게임 완료 시 한 번만 로그
+  useEffect(() => {
+    if (!done || didLogComplete.current || questions.length === 0) return;
+    didLogComplete.current = true;
+    const elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+    logGameComplete({ mode, level, score, total: questions.length, timeSeconds: elapsed });
+  }, [done, mode, level, score, startTime, questions.length]);
 
   // 게임 완료
   if (done) {

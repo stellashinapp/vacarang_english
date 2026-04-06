@@ -1,6 +1,6 @@
 // 게임 모드 선택 화면
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -9,9 +9,11 @@ import {
   StyleSheet,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FONT, COLORS, SHADOW, RADIUS } from "../utils/theme";
 import { LEVEL_INFO } from "../data/words";
 import OrangeHeaderCharacter from "../components/OrangeHeaderCharacter";
+import { logMenuFirstEnter } from "../services/analytics";
 
 const HEADER_PURPLE = "#7B6BDF";
 const HEADER_PURPLE_DARK = "#5A4ABD";
@@ -66,6 +68,17 @@ export default function GameMenuScreen({
   const wrongCount = Object.values(wrongWords).filter((w) =>
     words.some((ww) => ww.en === w.word.en),
   ).length;
+
+  // 메뉴 첫 진입 시 로그 (레벨별 1회)
+  useEffect(() => {
+    const key = `analytics_menu_first_enter_level_${level}`;
+    AsyncStorage.getItem(key).then((v) => {
+      if (v !== "1") {
+        logMenuFirstEnter(level, "game_menu");
+        AsyncStorage.setItem(key, "1");
+      }
+    });
+  }, [level]);
 
   return (
     <View style={styles.outerContainer}>

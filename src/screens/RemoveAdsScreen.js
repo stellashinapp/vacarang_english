@@ -1,12 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { FONT, COLORS, SHADOW } from '../utils/theme';
 import { useAds } from '../context/AdsContext';
+import { logShopEnter } from '../services/analytics';
 
 const MAX_CONTENT_WIDTH = 480;
 
 export default function RemoveAdsScreen({ onBack }) {
   const { adsRemoved, setAdsRemoved } = useAds();
+
+  useEffect(() => {
+    logShopEnter();
+  }, []);
 
   const handlePurchase = () => {
     Alert.alert(

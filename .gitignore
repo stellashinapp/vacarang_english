@@ -1,0 +1,28 @@
+node_modules/
+.expo/
+
+# Credentials / signing
+credentials.json
+credentials/
+android/keystores/*.keystore
+android/keystores/*.jks
+android/key.properties
+google-services.json
+google-service-account.json
+
+# Android build outputs
+android/app/build/
+android/app/.cxx/
+android/.gradle/
+build-artifacts/
+
+# Expo / Metro caches
+.expo/web/cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

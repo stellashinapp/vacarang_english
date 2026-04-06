@@ -12,10 +12,11 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "image": "sdk-52"
+        "image": "sdk-53"
       }
     },
     "production": {
+      "credentialsSource": "local",
       "android": {
         "buildType": "app-bundle"
       },

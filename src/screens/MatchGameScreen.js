@@ -5,6 +5,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Animated } from '
 import { FONT, COLORS, SHADOW } from '../utils/theme';
 import { shuffle, speak, sfxTap, sfxMatch, sfxWrong, sfxRight, sfxDone, formatTime, capFirst } from '../utils/helpers';
 import { WORDS_L1 } from '../data/words';
+import { logGameComplete } from '../services/analytics';
 
 const { width } = Dimensions.get('window');
 const MAX_CONTENT_WIDTH = 480;
@@ -27,6 +28,7 @@ export default function MatchGameScreen({
   const starAnim1 = useRef(new Animated.Value(0)).current;
   const starAnim2 = useRef(new Animated.Value(0)).current;
   const starAnim3 = useRef(new Animated.Value(0)).current;
+  const didLogComplete = useRef(false);
 
   const generate = useCallback(() => {
     const pool = words.length >= 6 ? words : WORDS_L1;
@@ -51,6 +53,12 @@ export default function MatchGameScreen({
     const t = setInterval(() => setElapsed(Math.floor((Date.now() - startTime) / 1000)), 1000);
     return () => clearInterval(t);
   }, [startTime, done]);
+
+  useEffect(() => {
+    if (!done || didLogComplete.current) return;
+    didLogComplete.current = true;
+    logGameComplete({ mode: 'match', level, score: P, total: P, timeSeconds: elapsed, extra: { moves } });
+  }, [done, level, elapsed, moves]);
 
   const flip = (idx) => {
     if (flipped.length === 2 || flipped.includes(idx) || matched.includes(cards[idx].pid)) return;

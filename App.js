@@ -29,6 +29,7 @@ import ResultScreen from "./src/screens/ResultScreen";
 import RemoveAdsScreen from "./src/screens/RemoveAdsScreen";
 import { getAllWordsForLevel } from "./src/data/words";
 import { AdsProvider } from "./src/context/AdsContext";
+import { logScreenView, logGameStart } from "./src/services/analytics";
 
 
 // Paperlogy - assets/fonts/Paperlogy 폴더에 9개 TTF 파일 넣기
@@ -170,9 +171,16 @@ export default function App() {
   };
 
   const startGame = (mode) => {
+    logGameStart(mode, level);
     setGameMode(mode);
     setScreen("game");
   };
+
+  // 화면 전환 시 로그 (Firebase Analytics)
+  useEffect(() => {
+    const name = screen === "home" ? "home" : screen === "level" ? "level_select" : screen === "menu" ? "game_menu" : screen === "game" ? "game" : screen === "result" ? "result" : screen === "wordlist" ? "word_list" : screen === "wrongnote" ? "wrong_note" : screen === "shop" ? "shop" : screen;
+    logScreenView(name);
+  }, [screen]);
 
   const goWordList = () => setScreen("wordlist");
   const goWrongNote = () => setScreen("wrongnote");
