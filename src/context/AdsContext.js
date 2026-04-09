@@ -1,45 +1,49 @@
 // 광고 노출 규칙 및 광고 제거 구매 상태
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ADS_REMOVED_KEY = 'adsRemoved';
-const INSTALL_DATE_KEY = 'appInstallDate';
-const LAST_OPEN_DATE_KEY = 'appLastOpenDate';
-const LAST_INTERSTITIAL_KEY = 'lastInterstitialTime';
 const LAST_REWARDED_KEY = 'lastRewardedTime';
 
-const INTERSTITIAL_INTERVAL_MS = 30 * 1000;
-const REWARDED_INTERVAL_MS = 60 * 1000;
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const INTERSTITIAL_EVERY_N = 3;        // 전면광고: 3회 플레이마다 1회
+const REWARDED_INTERVAL_MS = 60 * 1000; // 보상형 최소 간격 60초
 
 const AdsContext = createContext(null);
 
 export function AdsProvider({ children }) {
   const [adsRemoved, setAdsRemovedState] = useState(false);
-  const [installDate, setInstallDate] = useState(null);
-  const [lastOpenDate, setLastOpenDate] = useState(null);
-  const [lastInterstitialTime, setLastInterstitialTime] = useState(0);
   const [lastRewardedTime, setLastRewardedTime] = useState(0);
+  const playCount = useRef(0);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    let isRemovedFromStorage = false;
+
     (async () => {
       try {
-        const [removed, install, lastOpen, lastInter, lastRew] = await Promise.all([
+        const [removed, lastRew] = await Promise.all([
           AsyncStorage.getItem(ADS_REMOVED_KEY),
-          AsyncStorage.getItem(INSTALL_DATE_KEY),
-          AsyncStorage.getItem(LAST_OPEN_DATE_KEY),
-          AsyncStorage.getItem(LAST_INTERSTITIAL_KEY),
           AsyncStorage.getItem(LAST_REWARDED_KEY),
         ]);
-        if (removed === 'true') setAdsRemovedState(true);
-        if (install) setInstallDate(Number(install));
-        if (lastOpen) setLastOpenDate(lastOpen);
-        if (lastInter) setLastInterstitialTime(Number(lastInter));
+        isRemovedFromStorage = removed === 'true';
+        if (isRemovedFromStorage) setAdsRemovedState(true);
         if (lastRew) setLastRewardedTime(Number(lastRew));
       } catch (e) {}
       setReady(true);
+
+      // 앱 시작 시 이전 구매 자동 복원
+      if (!isRemovedFromStorage) {
+        try {
+          const { initIAP, restorePurchases } = require('../services/iap');
+          await initIAP();
+          const restored = await restorePurchases();
+          if (restored) {
+            setAdsRemovedState(true);
+            await AsyncStorage.setItem(ADS_REMOVED_KEY, 'true');
+          }
+        } catch (e) {}
+      }
     })();
   }, []);
 
@@ -50,42 +54,18 @@ export function AdsProvider({ children }) {
     } catch (e) {}
   }, []);
 
-  useEffect(() => {
-    if (!ready) return;
-    (async () => {
-      try {
-        let install = installDate;
-        if (install == null) {
-          install = Date.now();
-          await AsyncStorage.setItem(INSTALL_DATE_KEY, String(install));
-          setInstallDate(install);
-        }
-        const today = new Date().toDateString();
-        const last = lastOpenDate;
-        if (Date.now() - install >= ONE_DAY_MS && last !== today) {
-          try {
-            const { showAppOpenAd } = require('../services/ads');
-            showAppOpenAd();
-          } catch (e) {}
-        }
-        await AsyncStorage.setItem(LAST_OPEN_DATE_KEY, today);
-        setLastOpenDate(today);
-      } catch (e) {}
-    })();
-  }, [ready]);
-
+  // 전면광고: 3회 플레이마다 표시
   const showInterstitial = useCallback(() => {
     if (adsRemoved) return;
-    const now = Date.now();
-    if (now - lastInterstitialTime < INTERSTITIAL_INTERVAL_MS) return;
-    setLastInterstitialTime(now);
-    AsyncStorage.setItem(LAST_INTERSTITIAL_KEY, String(now)).catch(() => {});
+    playCount.current += 1;
+    if (playCount.current % INTERSTITIAL_EVERY_N !== 0) return;
     try {
       const { showInterstitialAd } = require('../services/ads');
       showInterstitialAd();
     } catch (e) {}
-  }, [adsRemoved, lastInterstitialTime]);
+  }, [adsRemoved]);
 
+  // 보상형광고: 레벨 변경 시 호출
   const showRewarded = useCallback((onRewarded) => {
     if (adsRemoved) { onRewarded?.(); return; }
     const now = Date.now();
@@ -98,8 +78,9 @@ export function AdsProvider({ children }) {
     } catch (e) { onRewarded?.(); }
   }, [adsRemoved, lastRewardedTime]);
 
+  // ready 전에는 children 렌더링하되 광고 안 보이도록
   return (
-    <AdsContext.Provider value={{ adsRemoved, setAdsRemoved, showInterstitial, showRewarded }}>
+    <AdsContext.Provider value={{ adsRemoved: adsRemoved || !ready, setAdsRemoved, showInterstitial, showRewarded }}>
       {children}
     </AdsContext.Provider>
   );

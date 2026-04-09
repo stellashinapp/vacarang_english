@@ -1,8 +1,12 @@
 {
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-4418561224540686~2979001914",
+    "ios_app_id": "ca-app-pub-4418561224540686~7394053367"
+  },
   "expo": {
     "name": "보카랑 잉글리쉬",
     "slug": "vacarang",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -29,7 +33,7 @@
         "backgroundColor": "#F8F9FF"
       },
       "package": "com.vacarang.english",
-      "versionCode": 11,
+      "versionCode": 13,
       "permissions": [],
       "googleServicesFile": "./google-services.json"
     },
@@ -57,7 +61,14 @@
           }
         }
       ],
-      "@react-native-firebase/app"
+      "@react-native-firebase/app",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-4418561224540686~2979001914",
+          "iosAppId": "ca-app-pub-4418561224540686~7394053367"
+        }
+      ]
     ],
     "updates": {
       "url": "https://u.expo.dev/5dc97be5-abb4-444f-8aee-fa16d6821fc7"
@@ -70,4 +81,3 @@
     }
   }
 }
-

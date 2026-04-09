@@ -6,6 +6,7 @@ import { FONT, COLORS, SHADOW } from '../utils/theme';
 import { shuffle, speak, sfxTap, sfxMatch, sfxWrong, sfxRight, sfxDone, formatTime, capFirst } from '../utils/helpers';
 import { WORDS_L1 } from '../data/words';
 import { logGameComplete } from '../services/analytics';
+import { useAds } from '../context/AdsContext';
 
 const { width } = Dimensions.get('window');
 const MAX_CONTENT_WIDTH = 480;
@@ -18,6 +19,7 @@ export default function MatchGameScreen({
   words, level, onBack,
   wrongWords, attemptHistory, addWrongWord, removeWrongWord, recordAttempt,
 }) {
+  const { showInterstitial } = useAds();
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
   const [matched, setMatched] = useState([]);
@@ -44,6 +46,7 @@ export default function MatchGameScreen({
     setDone(false);
     setStartTime(Date.now());
     setElapsed(0);
+    didLogComplete.current = false;
   }, [words]);
 
   useEffect(() => { generate(); }, [generate]);
@@ -99,7 +102,7 @@ export default function MatchGameScreen({
           <Text style={styles.resultTitle}>매칭 완료!</Text>
           <Text style={styles.resultStat}>{moves}번 시도 · {formatTime(elapsed)}</Text>
           <View style={{ flexDirection: 'row', gap: 12, marginTop: 24 }}>
-            <TouchableOpacity style={styles.btnPrimary} onPress={generate}>
+            <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(); generate(); }}>
               <Text style={styles.btnText}>다시 하기</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.btnSecondary} onPress={onBack}>

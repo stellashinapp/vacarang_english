@@ -11,6 +11,7 @@ import { FONT, COLORS, SHADOW } from '../utils/theme';
 import { shuffle, speak, sfxCorrect, sfxWrong, sfxRight, sfxDone, formatTime, getGrade, capFirst } from '../utils/helpers';
 import { WORDS_L1 } from '../data/words';
 import { logGameComplete } from '../services/analytics';
+import { useAds } from '../context/AdsContext';
 
 const MAX_CONTENT_WIDTH = 480;
 const N = 10;
@@ -19,6 +20,7 @@ export default function QuizGameScreen({
   mode, words, level, onBack, onGameEnd,
   wrongWords, attemptHistory, addWrongWord, removeWrongWord, recordAttempt,
 }) {
+  const { showInterstitial } = useAds();
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
@@ -34,8 +36,7 @@ export default function QuizGameScreen({
   const [totalAttempts, setTotalAttempts] = useState(0);
 
   // 애니메이션
-  const shakeAnim = new Animated.Value(0);
-  const fadeAnim = new Animated.Value(0);
+  const shakeAnim = useRef(new Animated.Value(0)).current;
   const star1 = useRef(new Animated.Value(0)).current;
   const star2 = useRef(new Animated.Value(0)).current;
   const star3 = useRef(new Animated.Value(0)).current;
@@ -97,6 +98,7 @@ export default function QuizGameScreen({
     setStartTime(Date.now());
     setWrongList([]);
     setTotalAttempts(0);
+    didLogComplete.current = false;
   }, [words, mode]);
 
   useEffect(() => {
@@ -164,9 +166,6 @@ export default function QuizGameScreen({
     }
   };
 
-  // 로딩 중
-  if (questions.length === 0) return null;
-
   // 게임 완료 시 한 번만 로그
   useEffect(() => {
     if (!done || didLogComplete.current || questions.length === 0) return;
@@ -174,6 +173,9 @@ export default function QuizGameScreen({
     const elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
     logGameComplete({ mode, level, score, total: questions.length, timeSeconds: elapsed });
   }, [done, mode, level, score, startTime, questions.length]);
+
+  // 로딩 중
+  if (questions.length === 0) return null;
 
   // 게임 완료
   if (done) {
@@ -235,7 +237,7 @@ export default function QuizGameScreen({
           )}
 
           <View style={styles.resultBtnRow}>
-            <TouchableOpacity style={styles.btnPrimary} onPress={generateQuestions}>
+            <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(); generateQuestions(); }}>
               <Text style={styles.btnPrimaryText}>다시 하기</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.btnSecondary} onPress={onBack}>

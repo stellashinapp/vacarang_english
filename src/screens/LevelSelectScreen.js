@@ -18,6 +18,7 @@ const CARD_GRAD_END = "#7B6BDF";
 import { LEVEL_INFO, getAllWordsForLevel } from "../data/words";
 import { GhostAnim, BounceAnim, SquirmAnim, BallBounceAnim, DriftAnim } from "../components/CharacterAnims";
 import { logLevelSelectEnter } from "../services/analytics";
+import { useAds } from "../context/AdsContext";
 
 const CHAR_SIZE = 60;
 const CHAR_SIZE_MID = 72;
@@ -30,9 +31,21 @@ export default function LevelSelectScreen({
   onBack,
   attemptHistory,
 }) {
+  const { showRewarded } = useAds();
+
   useEffect(() => {
     logLevelSelectEnter();
   }, []);
+
+  const handleSelect = (lv) => {
+    if (lv === currentLevel) {
+      // 현재 레벨 재선택 → 바로 이동
+      onSelect(lv);
+    } else {
+      // 다른 레벨 선택 → 보상형 광고 후 이동
+      showRewarded(() => onSelect(lv));
+    }
+  };
 
   const levels = LEVEL_INFO.map((l) => ({
     ...l,
@@ -106,7 +119,7 @@ export default function LevelSelectScreen({
 
           if (isCurrent) {
             return (
-              <TouchableOpacity key={lv.level} onPress={() => onSelect(lv.level)} activeOpacity={0.7}>
+              <TouchableOpacity key={lv.level} onPress={() => handleSelect(lv.level)} activeOpacity={0.7}>
                 <LinearGradient
                   colors={[CARD_GRAD_START, CARD_GRAD_END]}
                   start={[0, 0.5]}
@@ -123,7 +136,7 @@ export default function LevelSelectScreen({
             <TouchableOpacity
               key={lv.level}
               style={styles.card}
-              onPress={() => onSelect(lv.level)}
+              onPress={() => handleSelect(lv.level)}
               activeOpacity={0.7}
             >
               {cardInner}

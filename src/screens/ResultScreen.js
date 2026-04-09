@@ -8,13 +8,6 @@ import { useAds } from "../context/AdsContext";
 
 const MAX_CONTENT_WIDTH = 480;
 
-function withInterstitial(fn, showInterstitial) {
-  return () => {
-    showInterstitial();
-    fn?.();
-  };
-}
-
 export default function ResultScreen({
   result,
   wrongWords,
@@ -23,16 +16,13 @@ export default function ResultScreen({
   onHome,
   onNextStage,
 }) {
-  const { showInterstitial, showRewarded } = useAds();
+  const { showRewarded } = useAds();
 
   if (!result) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>결과 없음</Text>
-        <TouchableOpacity
-          style={styles.btn}
-          onPress={withInterstitial(onMenu, showInterstitial)}
-        >
+        <TouchableOpacity style={styles.btn} onPress={onMenu}>
           <Text style={styles.btnText}>메뉴로</Text>
         </TouchableOpacity>
       </View>
@@ -52,16 +42,10 @@ export default function ResultScreen({
       </Text>
 
       <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={styles.btn}
-          onPress={withInterstitial(onRetry, showInterstitial)}
-        >
+        <TouchableOpacity style={styles.btn} onPress={onRetry}>
           <Text style={styles.btnText}>다시 하기</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.btnSec}
-          onPress={withInterstitial(onMenu, showInterstitial)}
-        >
+        <TouchableOpacity style={styles.btnSec} onPress={onMenu}>
           <Text style={styles.btnSecText}>메뉴로</Text>
         </TouchableOpacity>
       </View>
