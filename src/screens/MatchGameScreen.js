@@ -6,6 +6,7 @@ import { FONT, COLORS, SHADOW } from '../utils/theme';
 import { shuffle, speak, sfxTap, sfxMatch, sfxWrong, sfxRight, sfxDone, formatTime, capFirst } from '../utils/helpers';
 import { WORDS_L1 } from '../data/words';
 import { logGameComplete } from '../services/analytics';
+import { checkAndRequestReview } from '../utils/storeReview';
 import { useAds } from '../context/AdsContext';
 
 const { width } = Dimensions.get('window');
@@ -61,6 +62,7 @@ export default function MatchGameScreen({
     if (!done || didLogComplete.current) return;
     didLogComplete.current = true;
     logGameComplete({ mode: 'match', level, score: P, total: P, timeSeconds: elapsed, extra: { moves } });
+    checkAndRequestReview();
   }, [done, level, elapsed, moves]);
 
   const flip = (idx) => {

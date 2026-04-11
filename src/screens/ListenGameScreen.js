@@ -7,6 +7,7 @@ import { FONT, COLORS, SHADOW } from '../utils/theme';
 import { shuffle, speak, sfxCorrect, sfxWrong, sfxRight, sfxDone, formatTime, getGrade, capFirst } from '../utils/helpers';
 import { WORDS_L1 } from '../data/words';
 import { logGameComplete } from '../services/analytics';
+import { checkAndRequestReview } from '../utils/storeReview';
 import { useAds } from '../context/AdsContext';
 
 const N = 10;
@@ -97,6 +98,7 @@ export default function ListenGameScreen({
     didLogComplete.current = true;
     const elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
     logGameComplete({ mode: 'listen', level, score, total: N, timeSeconds: elapsed });
+    checkAndRequestReview();
   }, [done, level, score, startTime, qs.length]);
 
   if (qs.length === 0) return null;

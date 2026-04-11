@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const ADS_REMOVED_KEY = 'adsRemoved';
 const LAST_REWARDED_KEY = 'lastRewardedTime';
 
-const INTERSTITIAL_EVERY_N = 3;        // 전면광고: 3회 플레이마다 1회
+const INTERSTITIAL_EVERY_N = 2;        // 전면광고: 2회 플레이마다 1회
 const REWARDED_INTERVAL_MS = 60 * 1000; // 보상형 최소 간격 60초
 
 const AdsContext = createContext(null);
