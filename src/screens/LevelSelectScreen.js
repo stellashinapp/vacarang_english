@@ -111,8 +111,12 @@ export default function LevelSelectScreen({
                   <Text style={[styles.cardSubtitle, isCurrent && styles.cardSubtitleOnSelected]} numberOfLines={1}>
                     {lv.desc} · {lv.actual}개 단어
                   </Text>
+                  {lv.topics ? (
+                    <Text style={[styles.cardTopics, isCurrent && styles.cardTopicsOnSelected]} numberOfLines={2}>
+                      {lv.topics}
+                    </Text>
+                  ) : null}
                 </View>
-                <Text style={[styles.cardCount, isCurrent && styles.cardCountOnSelected]}>{lv.actual}개</Text>
               </View>
             </>
           );
@@ -267,10 +271,14 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginTop: 4,
   },
-  cardCount: {
-    fontSize: 15,
-    fontFamily: FONT.semiBold,
-    color: COLORS.textSecondary,
-    marginLeft: 8,
+  cardTopics: {
+    fontSize: 11,
+    fontFamily: FONT.regular,
+    color: COLORS.textLight,
+    marginTop: 3,
+    lineHeight: 16,
+  },
+  cardTopicsOnSelected: {
+    color: 'rgba(255,255,255,0.7)',
   },
 });

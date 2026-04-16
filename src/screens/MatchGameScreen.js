@@ -17,7 +17,7 @@ const GAP = 8;
 const CARD_W = (Math.min(width, MAX_CONTENT_WIDTH) - 40 - GAP * (COLS - 1)) / COLS;
 
 export default function MatchGameScreen({
-  words, level, onBack,
+  words, level, onBack, onNextLevel,
   wrongWords, attemptHistory, addWrongWord, removeWrongWord, recordAttempt,
 }) {
   const { showInterstitial } = useAds();
@@ -103,10 +103,15 @@ export default function MatchGameScreen({
           <Text style={{ fontSize: 72 }}>{'⭐'.repeat(stars)}</Text>
           <Text style={styles.resultTitle}>매칭 완료!</Text>
           <Text style={styles.resultStat}>{moves}번 시도 · {formatTime(elapsed)}</Text>
-          <View style={{ flexDirection: 'row', gap: 12, marginTop: 24 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 12, marginTop: 24 }}>
             <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(); generate(); }}>
               <Text style={styles.btnText}>다시 하기</Text>
             </TouchableOpacity>
+            {onNextLevel && (
+              <TouchableOpacity style={styles.btnNext} onPress={onNextLevel}>
+                <Text style={styles.btnText}>다음 레벨 →</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity style={styles.btnSecondary} onPress={onBack}>
               <Text style={styles.btnSecText}>메뉴로</Text>
             </TouchableOpacity>
@@ -212,6 +217,7 @@ const styles = StyleSheet.create({
   resultTitle: { fontSize: 30, fontFamily: FONT.extraBold, color: COLORS.text, marginTop: 8, marginBottom: 10 },
   resultStat: { fontSize: 18, fontFamily: FONT.semiBold, color: COLORS.textSecondary },
   btnPrimary: { backgroundColor: COLORS.primary, borderRadius: 14, paddingVertical: 16, paddingHorizontal: 32 },
+  btnNext: { backgroundColor: '#f59e0b', borderRadius: 14, paddingVertical: 16, paddingHorizontal: 32 },
   btnText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.white },
   btnSecondary: { backgroundColor: '#f3f4f6', borderRadius: 14, paddingVertical: 16, paddingHorizontal: 32 },
   btnSecText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.textSecondary },

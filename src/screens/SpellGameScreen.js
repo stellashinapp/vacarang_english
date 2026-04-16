@@ -10,6 +10,9 @@ import {
   StyleSheet,
   Animated,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from "react-native";
 import { FONT, COLORS, SHADOW } from "../utils/theme";
 import {
@@ -35,6 +38,7 @@ export default function SpellGameScreen({
   words,
   level,
   onBack,
+  onNextLevel,
   wrongWords,
   attemptHistory,
   addWrongWord,
@@ -101,6 +105,7 @@ export default function SpellGameScreen({
     } else {
       setRes("wrong");
       sfxWrong();
+      setTimeout(() => speak(w.en), 500);
       recordAttempt(w, false);
       addWrongWord(w);
       setWrongList((prev) => [...prev, w]);
@@ -155,10 +160,15 @@ export default function SpellGameScreen({
               ))}
             </View>
           )}
-          <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 12, marginTop: 16 }}>
             <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(); generate(); }}>
               <Text style={styles.btnText}>다시 하기</Text>
             </TouchableOpacity>
+            {onNextLevel && (
+              <TouchableOpacity style={styles.btnNext} onPress={onNextLevel}>
+                <Text style={styles.btnText}>다음 레벨 →</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity style={styles.btnSecondary} onPress={onBack}>
               <Text style={styles.btnSecText}>메뉴로</Text>
             </TouchableOpacity>
@@ -172,7 +182,13 @@ export default function SpellGameScreen({
   const hint = w.en.charAt(0) + w.en.slice(1).replace(/[a-z]/gi, " _ ");
 
   return (
-    <View style={styles.outer}><View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.outer}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+    >
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+    <View style={styles.container}>
       <View style={styles.topBar}>
         <TouchableOpacity onPress={onBack}>
           <Text style={styles.backBtn}>← 뒤로</Text>
@@ -261,7 +277,9 @@ export default function SpellGameScreen({
           </Text>
         </View>
       )}
-    </View></View>
+    </View>
+    </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -413,6 +431,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   btnText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.white },
+  btnNext: {
+    backgroundColor: '#f59e0b',
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+  },
   btnSecondary: {
     backgroundColor: "#f3f4f6",
     borderRadius: 14,

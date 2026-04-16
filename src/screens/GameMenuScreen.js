@@ -135,6 +135,11 @@ export default function GameMenuScreen({
                 <Text style={styles.levelDesc}>
                   {info.desc} · {words.length}개 단어
                 </Text>
+                {info.topics ? (
+                  <Text style={styles.levelTopics} numberOfLines={2}>
+                    {info.topics}
+                  </Text>
+                ) : null}
               </View>
             </View>
             <TouchableOpacity
@@ -306,6 +311,13 @@ const styles = StyleSheet.create({
     fontFamily: FONT.regular,
     color: COLORS.textSecondary,
     marginTop: 4,
+  },
+  levelTopics: {
+    fontSize: 11,
+    fontFamily: FONT.regular,
+    color: COLORS.textLight,
+    marginTop: 3,
+    lineHeight: 16,
   },
   changeLevelBtn: {
     backgroundColor: COLORS.border,

@@ -28,7 +28,8 @@ import WordListScreen from "./src/screens/WordListScreen";
 import ResultScreen from "./src/screens/ResultScreen";
 import RemoveAdsScreen from "./src/screens/RemoveAdsScreen";
 import { getAllWordsForLevel } from "./src/data/words";
-import { AdsProvider } from "./src/context/AdsContext";
+import { AdsProvider, setGlobalCurrentLevel } from "./src/context/AdsContext";
+import { LEVEL_INFO } from "./src/data/words";
 import { logScreenView, logGameStart } from "./src/services/analytics";
 
 
@@ -166,8 +167,19 @@ export default function App() {
 
   const selectLevel = (lv) => {
     setLevel(lv);
+    setGlobalCurrentLevel(lv);
     setWords(getAllWordsForLevel(lv));
     setScreen("menu");
+  };
+
+  // 다음 레벨로 이동
+  const goNextLevel = () => {
+    const maxLevel = LEVEL_INFO.length;
+    if (level < maxLevel) {
+      selectLevel(level + 1);
+    } else {
+      goMenu(); // 마지막 레벨이면 메뉴로
+    }
   };
 
   const startGame = (mode) => {
@@ -197,6 +209,7 @@ export default function App() {
     level,
     onBack: goMenu,
     onGameEnd,
+    onNextLevel: goNextLevel,
     wrongWords,
     attemptHistory,
     addWrongWord,

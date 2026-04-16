@@ -6,10 +6,10 @@ import {
   AdEventType,
   RewardedAdEventType,
 } from 'react-native-google-mobile-ads';
+import { AppState } from 'react-native';
 import { INTERSTITIAL_ID, REWARDED_ID } from '../utils/adUnitIds';
 
 // ── 전면 광고 (Interstitial) ──
-// 퀴즈 3회 플레이마다 표시
 
 let interstitial = null;
 let interstitialLoaded = false;
@@ -22,9 +22,9 @@ function clearInterstitialListeners() {
 
 function loadInterstitial() {
   clearInterstitialListeners();
+  interstitialLoaded = false;
   try {
     interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_ID);
-    interstitialLoaded = false;
 
     interstitialListeners.push(
       interstitial.addAdEventListener(AdEventType.LOADED, () => {
@@ -32,17 +32,22 @@ function loadInterstitial() {
       }),
       interstitial.addAdEventListener(AdEventType.CLOSED, () => {
         interstitialLoaded = false;
-        loadInterstitial();
+        interstitial = null;
+        // 닫힌 후 새 광고 로드
+        setTimeout(loadInterstitial, 1000);
       }),
-      interstitial.addAdEventListener(AdEventType.ERROR, () => {
+      interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
         interstitialLoaded = false;
-        setTimeout(loadInterstitial, 10000);
+        interstitial = null;
+        console.warn('Interstitial error:', error);
+        setTimeout(loadInterstitial, 15000);
       }),
     );
 
     interstitial.load();
   } catch (e) {
     console.warn('Interstitial load error:', e);
+    setTimeout(loadInterstitial, 15000);
   }
 }
 
@@ -51,40 +56,60 @@ export function showInterstitialAd() {
     if (interstitialLoaded && interstitial) {
       interstitial.show();
     } else {
+      // 로드 안 되어 있으면 다시 로드 시도
       loadInterstitial();
     }
   } catch (e) {
     console.warn('Interstitial show error:', e);
+    loadInterstitial();
   }
 }
 
 // ── 보상형 광고 (Rewarded) ──
-// 레벨 변경 시 표시
 
 export function showRewardedAd(onRewarded) {
   let listeners = [];
+  let rewarding = false;
+  let cleaned = false;
+
+  const cleanup = () => {
+    if (cleaned) return;
+    cleaned = true;
+    listeners.forEach(unsub => unsub?.());
+    listeners = [];
+  };
+
   try {
     const rewarded = RewardedAd.createForAdRequest(REWARDED_ID);
-    let rewarding = false;
 
-    const cleanup = () => {
-      listeners.forEach(unsub => unsub?.());
-      listeners = [];
-    };
+    // 10초 타임아웃 - 로드 실패 시 콜백 호출하지 않음 (스킵 방지)
+    const timeout = setTimeout(() => {
+      cleanup();
+      // 타임아웃 시에도 콜백 호출하지 않음 → 레벨 변경 불가
+    }, 10000);
 
     listeners.push(
       rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+        clearTimeout(timeout);
         rewarded.show();
       }),
       rewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
         rewarding = true;
       }),
       rewarded.addAdEventListener(AdEventType.CLOSED, () => {
+        clearTimeout(timeout);
         cleanup();
-        if (rewarding) onRewarded?.();
+        // 보상을 받은 경우에만 콜백 실행
+        if (rewarding) {
+          onRewarded?.();
+        }
+        // 스킵한 경우 → 콜백 미실행 → 레벨 변경 안 됨
       }),
-      rewarded.addAdEventListener(AdEventType.ERROR, () => {
+      rewarded.addAdEventListener(AdEventType.ERROR, (error) => {
+        clearTimeout(timeout);
         cleanup();
+        console.warn('Rewarded ad error:', error);
+        // 에러 시에는 사용자 편의를 위해 통과
         onRewarded?.();
       }),
     );
@@ -96,5 +121,15 @@ export function showRewardedAd(onRewarded) {
   }
 }
 
-// 앱 시작 시 전면 광고 미리 로드
+// ── 앱 시작 시 전면 광고 미리 로드 ──
 try { loadInterstitial(); } catch (e) {}
+
+// ── 백그라운드 → 포그라운드 복귀 시 광고 재로드 ──
+AppState.addEventListener('change', (nextState) => {
+  if (nextState === 'active') {
+    // 포그라운드 복귀 시 전면 광고가 안 되어있으면 재로드
+    if (!interstitialLoaded) {
+      setTimeout(loadInterstitial, 2000);
+    }
+  }
+});

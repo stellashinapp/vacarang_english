@@ -151,8 +151,7 @@ export default function HomeScreen({ onStart }) {
           />
         </Animated.View>
         <View style={styles.subtitleArea}>
-          <Text style={styles.subtitle1}>영어 필수 단어 3,000</Text>
-          <Text style={styles.subtitle2}>1,715개 단어 수록</Text>
+          <Text style={styles.subtitle1}>Oxford 3000 영어 단어</Text>
         </View>
         <TouchableOpacity
           style={styles.startBtn}

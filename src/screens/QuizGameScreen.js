@@ -18,7 +18,7 @@ const MAX_CONTENT_WIDTH = 480;
 const N = 10;
 
 export default function QuizGameScreen({
-  mode, words, level, onBack, onGameEnd,
+  mode, words, level, onBack, onGameEnd, onNextLevel,
   wrongWords, attemptHistory, addWrongWord, removeWrongWord, recordAttempt,
 }) {
   const { showInterstitial } = useAds();
@@ -128,7 +128,7 @@ export default function QuizGameScreen({
       setSelected(idx);
       setShowResult(true);
       sfxCorrect();
-      setTimeout(() => speak(q.word.en), 1000);
+      speak(q.word.en);
       setScore(s => s + 1);
       const newStreak = streak + 1;
       setStreak(newStreak);
@@ -146,6 +146,7 @@ export default function QuizGameScreen({
       setShowResult(true);
       sfxWrong();
       triggerShake();
+      setTimeout(() => speak(q.word.en), 500);
       setStreak(0);
       recordAttempt(q.word, false);
       addWrongWord(q.word);
@@ -242,6 +243,11 @@ export default function QuizGameScreen({
             <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(); generateQuestions(); }}>
               <Text style={styles.btnPrimaryText}>다시 하기</Text>
             </TouchableOpacity>
+            {onNextLevel && (
+              <TouchableOpacity style={styles.btnNext} onPress={onNextLevel}>
+                <Text style={styles.btnNextText}>다음 레벨 →</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity style={styles.btnSecondary} onPress={onBack}>
               <Text style={styles.btnSecondaryText}>메뉴로</Text>
             </TouchableOpacity>
@@ -535,7 +541,7 @@ const styles = StyleSheet.create({
   wrongKo: { fontSize: 16, fontFamily: FONT.semiBold, color: COLORS.textSecondary },
   wrongEmoji: { fontSize: 20 },
 
-  resultBtnRow: { flexDirection: 'row', gap: 12, marginTop: 10 },
+  resultBtnRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 12, marginTop: 10 },
   btnPrimary: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
@@ -549,5 +555,12 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 32,
   },
+  btnNext: {
+    backgroundColor: '#f59e0b',
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+  },
+  btnNextText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.white },
   btnSecondaryText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.textSecondary },
 });

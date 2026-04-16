@@ -14,7 +14,7 @@ const N = 10;
 const MAX_CONTENT_WIDTH = 480;
 
 export default function ListenGameScreen({
-  words, level, onBack,
+  words, level, onBack, onNextLevel,
   wrongWords, attemptHistory, addWrongWord, removeWrongWord, recordAttempt,
 }) {
   const { showInterstitial } = useAds();
@@ -68,7 +68,7 @@ export default function ListenGameScreen({
       setSel(idx);
       setShow(true);
       sfxCorrect();
-      setTimeout(() => speak(qs[cur].word.en), 1000);
+      speak(qs[cur].word.en);
       setScore(s => s + 1);
       recordAttempt(qs[cur].word, true);
       removeWrongWord(qs[cur].word);
@@ -81,6 +81,7 @@ export default function ListenGameScreen({
       setSel(idx);
       setShow(true);
       sfxWrong();
+      setTimeout(() => speak(qs[cur].word.en), 500);
       recordAttempt(qs[cur].word, false);
       addWrongWord(qs[cur].word);
       setWrongList(prev => [...prev, qs[cur].word]);
@@ -121,10 +122,15 @@ export default function ListenGameScreen({
               ))}
             </View>
           )}
-          <View style={{ flexDirection: 'row', gap: 12, marginTop: 16 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 12, marginTop: 16 }}>
             <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(); generate(); }}>
               <Text style={styles.btnText}>다시 하기</Text>
             </TouchableOpacity>
+            {onNextLevel && (
+              <TouchableOpacity style={styles.btnNext} onPress={onNextLevel}>
+                <Text style={styles.btnText}>다음 레벨 →</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity style={styles.btnSecondary} onPress={onBack}>
               <Text style={styles.btnSecText}>메뉴로</Text>
             </TouchableOpacity>
@@ -235,6 +241,7 @@ const styles = StyleSheet.create({
   wrongItem: { fontSize: 16, fontFamily: FONT.semiBold, color: COLORS.text, paddingVertical: 4 },
   btnPrimary: { backgroundColor: COLORS.primary, borderRadius: 14, paddingVertical: 16, paddingHorizontal: 32 },
   btnText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.white },
+  btnNext: { backgroundColor: '#f59e0b', borderRadius: 14, paddingVertical: 16, paddingHorizontal: 32 },
   btnSecondary: { backgroundColor: '#f3f4f6', borderRadius: 14, paddingVertical: 16, paddingHorizontal: 32 },
   btnSecText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.textSecondary },
 });
