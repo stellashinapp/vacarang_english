@@ -4,9 +4,9 @@
     "ios_app_id": "ca-app-pub-4418561224540686~7394053367"
   },
   "expo": {
-    "name": "보카랑 잉글리쉬",
-    "slug": "vacarang",
-    "version": "1.0.11",
+    "name": "보카랑 일본어",
+    "slug": "vacarang-japanese",
+    "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -20,7 +20,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.vacarang.english",
+      "bundleIdentifier": "com.vacarang.japanese",
       "buildNumber": "1",
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true,
@@ -32,8 +32,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#F8F9FF"
       },
-      "package": "com.vacarang.english",
-      "versionCode": 13,
+      "package": "com.vacarang.japanese",
+      "versionCode": 1,
       "permissions": [],
       "googleServicesFile": "./google-services.json"
     },

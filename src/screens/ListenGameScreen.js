@@ -14,7 +14,7 @@ const N = 10;
 const MAX_CONTENT_WIDTH = 480;
 
 export default function ListenGameScreen({
-  words, level, onBack,
+  words, level, onBack, onNextLevel,
   wrongWords, attemptHistory, addWrongWord, removeWrongWord, recordAttempt,
 }) {
   const { showInterstitial } = useAds();
@@ -55,7 +55,7 @@ export default function ListenGameScreen({
 
   useEffect(() => {
     if (qs.length > 0 && !done) {
-      setTimeout(() => speak(qs[cur].word.en), 300);
+      speak(qs[cur].word.en);
     }
   }, [cur, qs, done]);
 
@@ -68,7 +68,7 @@ export default function ListenGameScreen({
       setSel(idx);
       setShow(true);
       sfxCorrect();
-      setTimeout(() => speak(qs[cur].word.en), 1000);
+      speak(qs[cur].word.en);
       setScore(s => s + 1);
       recordAttempt(qs[cur].word, true);
       removeWrongWord(qs[cur].word);
@@ -122,9 +122,14 @@ export default function ListenGameScreen({
             </View>
           )}
           <View style={{ flexDirection: 'row', gap: 12, marginTop: 16 }}>
-            <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(); generate(); }}>
+            <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(level); generate(); }}>
               <Text style={styles.btnText}>다시 하기</Text>
             </TouchableOpacity>
+            {onNextLevel && (
+              <TouchableOpacity style={styles.btnNext} onPress={onNextLevel}>
+                <Text style={styles.btnNextText}>다음 레벨 →</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity style={styles.btnSecondary} onPress={onBack}>
               <Text style={styles.btnSecText}>메뉴로</Text>
             </TouchableOpacity>
@@ -171,7 +176,10 @@ export default function ListenGameScreen({
           return (
             <TouchableOpacity key={i} style={[styles.optBtn, { backgroundColor: bg, borderColor: border }]}
               onPress={() => pick(i)} disabled={show} activeOpacity={0.7}>
-              <Text style={[styles.optText, { color }]}>{capFirst(opt.en)}</Text>
+              <View>
+                <Text style={[styles.optText, { color }]}>{opt.jp || capFirst(opt.en)}</Text>
+                {opt.reading ? <Text style={styles.optReading}>{opt.reading}</Text> : null}
+              </View>
               <Text style={styles.optKo}>{opt.ko}</Text>
             </TouchableOpacity>
           );
@@ -224,6 +232,7 @@ const styles = StyleSheet.create({
   optsContainer: { paddingHorizontal: 20, gap: 12 },
   optBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 16, paddingVertical: 18, paddingHorizontal: 20, borderWidth: 1.5, ...SHADOW.small },
   optText: { fontSize: 19, fontFamily: FONT.bold },
+  optReading: { fontSize: 12, fontFamily: FONT.regular, color: COLORS.textSecondary, marginTop: 1 },
   optKo: { fontSize: 15, fontFamily: FONT.semiBold, color: COLORS.textSecondary },
   answerBox: { marginTop: 18, marginHorizontal: 20, backgroundColor: '#eff6ff', borderRadius: 12, padding: 16, alignItems: 'center' },
   answerText: { fontSize: 17, fontFamily: FONT.semiBold, color: '#1e40af' },
@@ -237,4 +246,6 @@ const styles = StyleSheet.create({
   btnText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.white },
   btnSecondary: { backgroundColor: '#f3f4f6', borderRadius: 14, paddingVertical: 16, paddingHorizontal: 32 },
   btnSecText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.textSecondary },
+  btnNext: { backgroundColor: '#10b981', borderRadius: 14, paddingVertical: 16, paddingHorizontal: 32 },
+  btnNextText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.white },
 });

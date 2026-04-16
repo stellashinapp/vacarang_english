@@ -18,7 +18,7 @@ const MAX_CONTENT_WIDTH = 480;
 const N = 10;
 
 export default function QuizGameScreen({
-  mode, words, level, onBack, onGameEnd,
+  mode, words, level, onBack, onGameEnd, onNextLevel,
   wrongWords, attemptHistory, addWrongWord, removeWrongWord, recordAttempt,
 }) {
   const { showInterstitial } = useAds();
@@ -66,22 +66,23 @@ export default function QuizGameScreen({
       const others = shuffle(pool.filter(w => w.en !== word.en)).slice(0, 3);
 
       if (mode === 'en2ko') {
-        // 영어 보고 한국어 맞추기
+        // 일본어 보고 한국어 맞추기
         const opts = shuffle([word, ...others]);
         return {
           word,
-          display: capFirst(word.en),
+          display: word.jp || capFirst(word.en),
+          reading: word.reading || '',
           options: opts.map(o => ({ en: o.en, ko: o.ko, label: o.ko })),
           correctIndex: opts.indexOf(word),
         };
       } else {
-        // 이모지/한국어 보고 영어 맞추기
+        // 이모지/한국어 보고 일본어 맞추기
         const display = mode === 'emoji' ? word.emoji : word.ko;
         const opts = shuffle([word, ...others]);
         return {
           word,
           display,
-          options: opts.map(o => ({ en: o.en, ko: o.ko, label: capFirst(o.en) })),
+          options: opts.map(o => ({ en: o.en, ko: o.ko, jp: o.jp, reading: o.reading, label: o.jp || capFirst(o.en) })),
           correctIndex: opts.indexOf(word),
         };
       }
@@ -128,7 +129,7 @@ export default function QuizGameScreen({
       setSelected(idx);
       setShowResult(true);
       sfxCorrect();
-      setTimeout(() => speak(q.word.en), 1000);
+      speak(q.word.en);
       setScore(s => s + 1);
       const newStreak = streak + 1;
       setStreak(newStreak);
@@ -153,6 +154,13 @@ export default function QuizGameScreen({
       setTimeout(goNext, 2500);
     }
   };
+
+  // 문제가 바뀔 때 단어 자동 발음
+  useEffect(() => {
+    if (questions.length > 0 && !done) {
+      speak(questions[current].word.en);
+    }
+  }, [current, questions, done]);
 
   // 다음 문제로
   const goNext = () => {
@@ -239,9 +247,14 @@ export default function QuizGameScreen({
           )}
 
           <View style={styles.resultBtnRow}>
-            <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(); generateQuestions(); }}>
+            <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(level); generateQuestions(); }}>
               <Text style={styles.btnPrimaryText}>다시 하기</Text>
             </TouchableOpacity>
+            {onNextLevel && (
+              <TouchableOpacity style={styles.btnNext} onPress={onNextLevel}>
+                <Text style={styles.btnNextText}>다음 레벨 →</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity style={styles.btnSecondary} onPress={onBack}>
               <Text style={styles.btnSecondaryText}>메뉴로</Text>
             </TouchableOpacity>
@@ -258,8 +271,8 @@ export default function QuizGameScreen({
 
   const modeSubtitle = {
     emoji: '이미지를 보고 맞춰보세요!',
-    ko2en: '단어를 보고 영어를 찾아주세요.',
-    en2ko: '영어를 보고 뜻을 찾아주세요.',
+    ko2en: '한국어를 보고 일본어를 찾아주세요.',
+    en2ko: '일본어를 보고 뜻을 찾아주세요.',
   }[mode] || '';
 
   return (
@@ -299,6 +312,9 @@ export default function QuizGameScreen({
           ]}>
             {q.display}
           </Text>
+          {isEn && q.reading ? (
+            <Text style={styles.furigana}>{q.reading}</Text>
+          ) : null}
         </View>
         {mode === 'en2ko' && (
           <TouchableOpacity onPress={() => speak(q.word.en)} style={styles.speakBtn}>
@@ -337,9 +353,14 @@ export default function QuizGameScreen({
               disabled={showResult}
               activeOpacity={0.7}
             >
-              <Text style={[styles.optionText, { color: textColor }]}>
-                {opt.label}
-              </Text>
+              <View style={styles.optionLabelWrap}>
+                <Text style={[styles.optionText, { color: textColor }]}>
+                  {opt.label}
+                </Text>
+                {opt.reading ? (
+                  <Text style={styles.optionFurigana}>{opt.reading}</Text>
+                ) : null}
+              </View>
               {showResult && i === q.correctIndex && (
                 <Text style={styles.correctMark}>✓</Text>
               )}
@@ -355,7 +376,8 @@ export default function QuizGameScreen({
       {showResult && selected !== q.correctIndex && (
         <View style={styles.answerReveal}>
           <Text style={styles.answerRevealText}>
-            정답: <Text style={styles.answerRevealBold}>{capFirst(q.word.en)}</Text> = {q.word.ko}
+            정답: <Text style={styles.answerRevealBold}>{q.word.jp || capFirst(q.word.en)}</Text>
+            {q.word.reading ? ` (${q.word.reading})` : ''} = {q.word.ko}
             {q.word.emoji ? ` ${q.word.emoji}` : ''}
           </Text>
         </View>
@@ -449,6 +471,13 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     textAlign: 'center',
   },
+  furigana: {
+    fontSize: 16,
+    fontFamily: FONT.semiBold,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+    textAlign: 'center',
+  },
   speakBtn: { marginTop: 10, padding: 8 },
   speakIcon: { fontSize: 30 },
   emojiHint: {
@@ -476,10 +505,19 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     ...SHADOW.small,
   },
+  optionLabelWrap: {
+    alignItems: 'center',
+  },
   optionText: {
     fontSize: 19,
     fontFamily: FONT.bold,
     textAlign: 'center',
+  },
+  optionFurigana: {
+    fontSize: 12,
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
+    marginTop: 2,
   },
   correctMark: { fontSize: 20, color: COLORS.success, marginLeft: 8 },
   wrongMark: { fontSize: 20, color: COLORS.danger, marginLeft: 8 },
@@ -535,7 +573,7 @@ const styles = StyleSheet.create({
   wrongKo: { fontSize: 16, fontFamily: FONT.semiBold, color: COLORS.textSecondary },
   wrongEmoji: { fontSize: 20 },
 
-  resultBtnRow: { flexDirection: 'row', gap: 12, marginTop: 10 },
+  resultBtnRow: { flexDirection: 'row', gap: 12, marginTop: 10, flexWrap: 'wrap', justifyContent: 'center' },
   btnPrimary: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
@@ -550,4 +588,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   btnSecondaryText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.textSecondary },
+  btnNext: {
+    backgroundColor: COLORS.success || '#10b981',
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+  },
+  btnNextText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.white },
 });

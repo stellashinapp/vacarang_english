@@ -17,7 +17,7 @@ const GAP = 8;
 const CARD_W = (Math.min(width, MAX_CONTENT_WIDTH) - 40 - GAP * (COLS - 1)) / COLS;
 
 export default function MatchGameScreen({
-  words, level, onBack,
+  words, level, onBack, onNextLevel,
   wrongWords, attemptHistory, addWrongWord, removeWrongWord, recordAttempt,
 }) {
   const { showInterstitial } = useAds();
@@ -37,8 +37,8 @@ export default function MatchGameScreen({
     const pool = words.length >= 6 ? words : WORDS_L1;
     const sel = shuffle(pool).slice(0, P);
     const pairs = sel.flatMap((w, i) => [
-      { id: `en-${i}`, pid: i, text: capFirst(w.en), type: 'en', word: w },
-      { id: `ko-${i}`, pid: i, text: w.ko, type: 'ko', word: w },
+      { id: `en-${i}`, pid: i, text: w.jp || capFirst(w.en), reading: w.reading || '', type: 'en', word: w },
+      { id: `ko-${i}`, pid: i, text: w.ko, reading: '', type: 'ko', word: w },
     ]);
     setCards(shuffle(pairs));
     setFlipped([]);
@@ -104,9 +104,14 @@ export default function MatchGameScreen({
           <Text style={styles.resultTitle}>매칭 완료!</Text>
           <Text style={styles.resultStat}>{moves}번 시도 · {formatTime(elapsed)}</Text>
           <View style={{ flexDirection: 'row', gap: 12, marginTop: 24 }}>
-            <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(); generate(); }}>
+            <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(level); generate(); }}>
               <Text style={styles.btnText}>다시 하기</Text>
             </TouchableOpacity>
+            {onNextLevel && (
+              <TouchableOpacity style={styles.btnNext} onPress={onNextLevel}>
+                <Text style={styles.btnNextText}>다음 레벨 →</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity style={styles.btnSecondary} onPress={onBack}>
               <Text style={styles.btnSecText}>메뉴로</Text>
             </TouchableOpacity>
@@ -156,7 +161,8 @@ export default function MatchGameScreen({
                   <Text style={[styles.cardText, card.type === 'en' && { fontFamily: FONT.bold }]}>
                     {card.text}
                   </Text>
-                  <Text style={styles.cardType}>{card.type === 'en' ? '🇬🇧' : '🇰🇷'}</Text>
+                  {card.reading ? <Text style={styles.cardReading}>{card.reading}</Text> : null}
+                  <Text style={styles.cardType}>{card.type === 'en' ? '🇯🇵' : '🇰🇷'}</Text>
                 </View>
               ) : (
                 <Text style={styles.cardBack}>?</Text>
@@ -206,6 +212,7 @@ const styles = StyleSheet.create({
   cardMatched: { backgroundColor: '#d1fae5', borderColor: COLORS.success, opacity: 0.8 },
   cardInner: { alignItems: 'center', padding: 4 },
   cardText: { fontSize: 16, fontFamily: FONT.bold, color: COLORS.text, textAlign: 'center' },
+  cardReading: { fontSize: 10, fontFamily: FONT.regular, color: COLORS.textSecondary, marginTop: 2 },
   cardType: { fontSize: 14, fontFamily: FONT.semiBold, marginTop: 6 },
   cardBack: { fontSize: 30, fontFamily: FONT.bold, color: 'rgba(255,255,255,0.6)' },
   resultContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
@@ -215,4 +222,6 @@ const styles = StyleSheet.create({
   btnText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.white },
   btnSecondary: { backgroundColor: '#f3f4f6', borderRadius: 14, paddingVertical: 16, paddingHorizontal: 32 },
   btnSecText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.textSecondary },
+  btnNext: { backgroundColor: '#10b981', borderRadius: 14, paddingVertical: 16, paddingHorizontal: 32 },
+  btnNextText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.white },
 });

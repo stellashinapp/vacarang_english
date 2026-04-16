@@ -41,6 +41,9 @@ export default function LevelSelectScreen({
     if (lv === currentLevel) {
       // 현재 레벨 재선택 → 바로 이동
       onSelect(lv);
+    } else if (lv === 1) {
+      // Lv.1 입문 단계 → 광고 없이 바로 이동 (초기 진입 장벽 제거)
+      onSelect(lv);
     } else {
       // 다른 레벨 선택 → 보상형 광고 후 이동
       showRewarded(() => onSelect(lv));
@@ -111,8 +114,12 @@ export default function LevelSelectScreen({
                   <Text style={[styles.cardSubtitle, isCurrent && styles.cardSubtitleOnSelected]} numberOfLines={1}>
                     {lv.desc} · {lv.actual}개 단어
                   </Text>
+                  {lv.topics ? (
+                    <Text style={[styles.cardTopics, isCurrent && styles.cardTopicsOnSelected]} numberOfLines={2}>
+                      📌 {lv.topics}
+                    </Text>
+                  ) : null}
                 </View>
-                <Text style={[styles.cardCount, isCurrent && styles.cardCountOnSelected]}>{lv.actual}개</Text>
               </View>
             </>
           );
@@ -267,10 +274,14 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginTop: 4,
   },
-  cardCount: {
-    fontSize: 15,
-    fontFamily: FONT.semiBold,
-    color: COLORS.textSecondary,
-    marginLeft: 8,
+  cardTopics: {
+    fontSize: 11,
+    fontFamily: FONT.regular,
+    color: COLORS.textLight,
+    marginTop: 5,
+    lineHeight: 16,
+  },
+  cardTopicsOnSelected: {
+    color: 'rgba(255,255,255,0.75)',
   },
 });

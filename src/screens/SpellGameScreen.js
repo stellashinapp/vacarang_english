@@ -10,6 +10,9 @@ import {
   StyleSheet,
   Animated,
   Keyboard,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
 import { FONT, COLORS, SHADOW } from "../utils/theme";
 import {
@@ -35,6 +38,7 @@ export default function SpellGameScreen({
   words,
   level,
   onBack,
+  onNextLevel,
   wrongWords,
   attemptHistory,
   addWrongWord,
@@ -76,14 +80,16 @@ export default function SpellGameScreen({
 
   useEffect(() => {
     if (ws.length > 0 && !done) {
-      setTimeout(() => speak(ws[cur].en), 300);
+      speak(ws[cur].en);
     }
   }, [cur, ws, done]);
 
   const submit = () => {
     if (!input.trim() || res !== null) return;
     const w = ws[cur];
-    const ok = input.trim().toLowerCase() === w.en.toLowerCase();
+    // 히라가나 reading으로 비교 (reading 없으면 jp로 비교)
+    const answer = (w.reading || w.jp || w.en).trim();
+    const ok = input.trim() === answer;
 
     if (ok) {
       setRes("correct");
@@ -156,9 +162,14 @@ export default function SpellGameScreen({
             </View>
           )}
           <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>
-            <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(); generate(); }}>
+            <TouchableOpacity style={styles.btnPrimary} onPress={() => { showInterstitial(level); generate(); }}>
               <Text style={styles.btnText}>다시 하기</Text>
             </TouchableOpacity>
+            {onNextLevel && (
+              <TouchableOpacity style={styles.btnNext} onPress={onNextLevel}>
+                <Text style={styles.btnNextText}>다음 레벨 →</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity style={styles.btnSecondary} onPress={onBack}>
               <Text style={styles.btnSecText}>메뉴로</Text>
             </TouchableOpacity>
@@ -169,10 +180,23 @@ export default function SpellGameScreen({
   }
 
   const w = ws[cur];
-  const hint = w.en.charAt(0) + w.en.slice(1).replace(/[a-z]/gi, " _ ");
+  const reading = w.reading || w.jp || w.en;
+  // 히라가나 힌트: 첫 글자 보여주고 나머지 _ 처리
+  const hint = reading.charAt(0) + reading.slice(1).replace(/./g, ' ＿');
 
   return (
-    <View style={styles.outer}><View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.outer}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
+    <ScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
+    <View style={styles.container}>
       <View style={styles.topBar}>
         <TouchableOpacity onPress={onBack}>
           <Text style={styles.backBtn}>← 뒤로</Text>
@@ -182,7 +206,7 @@ export default function SpellGameScreen({
         </Text>
       </View>
 
-      <Text style={styles.modeSubtitle}>스펠링을 입력해보세요</Text>
+      <Text style={styles.modeSubtitle}>히라가나를 입력해보세요</Text>
 
       <View style={styles.progressSection}>
         <View style={styles.progressBar}>
@@ -207,7 +231,7 @@ export default function SpellGameScreen({
         <View style={styles.hintBox}>
           <Text style={styles.hintLabel}>💡 힌트</Text>
           <Text style={styles.hintText}>{hint}</Text>
-          <Text style={styles.hintLen}>{w.en.length}글자</Text>
+          <Text style={styles.hintLen}>{reading.length}글자</Text>
         </View>
       )}
 
@@ -223,7 +247,7 @@ export default function SpellGameScreen({
           value={input}
           onChangeText={setInput}
           onSubmitEditing={submit}
-          placeholder="영어 단어를 입력하세요"
+          placeholder="히라가나를 입력하세요"
           placeholderTextColor={COLORS.textLight}
           autoCapitalize="none"
           autoCorrect={false}
@@ -241,11 +265,23 @@ export default function SpellGameScreen({
         </TouchableOpacity>
       </View>
 
+      {/* 히라가나 입력 안내 */}
+      <View style={styles.tipBox}>
+        <Text style={styles.tipTitle}>📱 히라가나 입력 방법</Text>
+        <Text style={styles.tipText}>
+          [iPhone] 설정 → 일반 → 키보드 → 새로운 키보드 추가 → 일본어{'\n'}
+          [Android] 설정 → 언어 및 입력 → 키보드 관리 → 일본어 추가{'\n'}
+          입력 시 키보드의 🌐 버튼으로 일본어 전환{'\n'}
+          예) ka → か, shi → し, tsu → つ
+        </Text>
+      </View>
+
       {/* 결과 */}
       {res === "wrong" && (
         <View style={styles.answerBox}>
           <Text style={styles.answerText}>
-            정답: <Text style={{ fontFamily: FONT.bold }}>{capFirst(w.en)}</Text>
+            정답: <Text style={{ fontFamily: FONT.bold }}>{w.jp || capFirst(w.en)}</Text>
+            {w.reading ? ` (${w.reading})` : ''}
           </Text>
         </View>
       )}
@@ -257,11 +293,13 @@ export default function SpellGameScreen({
           ]}
         >
           <Text style={[styles.answerText, { color: "#065f46" }]}>
-            ✓ 정답! {capFirst(w.en)}
+            ✓ 정답! {w.jp || capFirst(w.en)}{w.reading ? ` (${w.reading})` : ''}
           </Text>
         </View>
       )}
-    </View></View>
+    </View>
+    </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -423,5 +461,33 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: FONT.bold,
     color: COLORS.textSecondary,
+  },
+  btnNext: {
+    backgroundColor: '#10b981',
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+  },
+  btnNextText: { fontSize: 18, fontFamily: FONT.bold, color: COLORS.white },
+  tipBox: {
+    marginTop: 14,
+    marginHorizontal: 20,
+    backgroundColor: '#f0f9ff',
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#bae6fd',
+  },
+  tipTitle: {
+    fontSize: 13,
+    fontFamily: FONT.bold,
+    color: '#0369a1',
+    marginBottom: 6,
+  },
+  tipText: {
+    fontSize: 12,
+    fontFamily: FONT.regular,
+    color: '#0c4a6e',
+    lineHeight: 19,
   },
 });

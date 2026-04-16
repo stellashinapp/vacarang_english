@@ -27,7 +27,7 @@ import MatchGameScreen from "./src/screens/MatchGameScreen";
 import WordListScreen from "./src/screens/WordListScreen";
 import ResultScreen from "./src/screens/ResultScreen";
 import RemoveAdsScreen from "./src/screens/RemoveAdsScreen";
-import { getAllWordsForLevel } from "./src/data/words";
+import { getAllWordsForLevel, LEVEL_INFO } from "./src/data/words";
 import { AdsProvider } from "./src/context/AdsContext";
 import { logScreenView, logGameStart } from "./src/services/analytics";
 
@@ -176,6 +176,15 @@ export default function App() {
     setScreen("game");
   };
 
+  // 다음 레벨로 이동 (최대 레벨이면 null → 버튼 숨김)
+  const maxLevel = LEVEL_INFO.length;
+  const goNextLevel = level < maxLevel ? () => {
+    const nextLv = level + 1;
+    setLevel(nextLv);
+    setWords(getAllWordsForLevel(nextLv));
+    setScreen("menu");
+  } : null;
+
   // 화면 전환 시 로그 (Firebase Analytics)
   useEffect(() => {
     const name = screen === "home" ? "home" : screen === "level" ? "level_select" : screen === "menu" ? "game_menu" : screen === "game" ? "game" : screen === "result" ? "result" : screen === "wordlist" ? "word_list" : screen === "wrongnote" ? "wrong_note" : screen === "shop" ? "shop" : screen;
@@ -197,6 +206,7 @@ export default function App() {
     level,
     onBack: goMenu,
     onGameEnd,
+    onNextLevel: goNextLevel,
     wrongWords,
     attemptHistory,
     addWrongWord,
