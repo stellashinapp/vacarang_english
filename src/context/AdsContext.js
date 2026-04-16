@@ -80,12 +80,12 @@ export function AdsProvider({ children }) {
     _globalCurrentLevel = level;
   }, []);
 
-  // 전면광고: 2회 플레이마다 표시 (Lv.1은 제외)
+  // 전면광고: Lv.1은 3회마다, 나머지는 2회마다
   const showInterstitial = useCallback(() => {
     if (adsRemoved) return;
-    if (currentLevel.current === 1) return; // Lv.1 광고 없음
     playCount.current += 1;
-    if (playCount.current % INTERSTITIAL_EVERY_N !== 0) return;
+    const interval = currentLevel.current === 1 ? 3 : INTERSTITIAL_EVERY_N;
+    if (playCount.current % interval !== 0) return;
     try {
       const { showInterstitialAd } = require('../services/ads');
       showInterstitialAd();
