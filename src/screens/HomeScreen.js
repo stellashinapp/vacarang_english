@@ -150,9 +150,7 @@ export default function HomeScreen({ onStart }) {
             resizeMode="contain"
           />
         </Animated.View>
-        <View style={styles.subtitleArea}>
-          <Text style={styles.subtitle1}>Oxford 3000 영어 단어</Text>
-        </View>
+        <View style={styles.subtitleArea} />
         <TouchableOpacity
           style={styles.startBtn}
           onPress={goToLevelSelect}

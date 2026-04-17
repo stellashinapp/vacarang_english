@@ -204,6 +204,14 @@ export default function GameMenuScreen({
             ))}
           </View>
 
+          {/* 광고 제거 구매 */}
+          {onShop && (
+            <TouchableOpacity style={styles.shopBtn} onPress={onShop} activeOpacity={0.7}>
+              <Text style={styles.shopIcon}>🔇</Text>
+              <Text style={styles.shopLabel}>광고 제거 구매</Text>
+            </TouchableOpacity>
+          )}
+
         </View>
       </ScrollView>
     </View>

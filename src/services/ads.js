@@ -33,7 +33,6 @@ function loadInterstitial() {
       interstitial.addAdEventListener(AdEventType.CLOSED, () => {
         interstitialLoaded = false;
         interstitial = null;
-        // 닫힌 후 새 광고 로드
         setTimeout(loadInterstitial, 1000);
       }),
       interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
@@ -56,7 +55,6 @@ export function showInterstitialAd() {
     if (interstitialLoaded && interstitial) {
       interstitial.show();
     } else {
-      // 로드 안 되어 있으면 다시 로드 시도
       loadInterstitial();
     }
   } catch (e) {
@@ -82,10 +80,8 @@ export function showRewardedAd(onRewarded) {
   try {
     const rewarded = RewardedAd.createForAdRequest(REWARDED_ID);
 
-    // 10초 타임아웃 - 로드 실패 시 콜백 호출하지 않음 (스킵 방지)
     const timeout = setTimeout(() => {
       cleanup();
-      // 타임아웃 시에도 콜백 호출하지 않음 → 레벨 변경 불가
     }, 10000);
 
     listeners.push(
@@ -99,17 +95,14 @@ export function showRewardedAd(onRewarded) {
       rewarded.addAdEventListener(AdEventType.CLOSED, () => {
         clearTimeout(timeout);
         cleanup();
-        // 보상을 받은 경우에만 콜백 실행
         if (rewarding) {
           onRewarded?.();
         }
-        // 스킵한 경우 → 콜백 미실행 → 레벨 변경 안 됨
       }),
       rewarded.addAdEventListener(AdEventType.ERROR, (error) => {
         clearTimeout(timeout);
         cleanup();
         console.warn('Rewarded ad error:', error);
-        // 에러 시에는 사용자 편의를 위해 통과
         onRewarded?.();
       }),
     );
@@ -127,7 +120,6 @@ try { loadInterstitial(); } catch (e) {}
 // ── 백그라운드 → 포그라운드 복귀 시 광고 재로드 ──
 AppState.addEventListener('change', (nextState) => {
   if (nextState === 'active') {
-    // 포그라운드 복귀 시 전면 광고가 안 되어있으면 재로드
     if (!interstitialLoaded) {
       setTimeout(loadInterstitial, 2000);
     }

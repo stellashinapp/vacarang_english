@@ -1,6 +1,5 @@
-// Oxford 3000 - Level 2: 초급 (A1 나머지 + A2 초반) 430개
+// Oxford 3000 - Level 2
 export const WORDS_L2 = [
-  // ── A ──
   { en: "ability", ko: "능력", emoji: "💪" },
   { en: "able", ko: "~할 수 있는", emoji: "✅" },
   { en: "abroad", ko: "해외에", emoji: "🌍" },
@@ -58,7 +57,6 @@ export const WORDS_L2 = [
   { en: "avoid", ko: "피하다", emoji: "🚫" },
   { en: "award", ko: "상", emoji: "🏆" },
   { en: "awful", ko: "끔찍한", emoji: "😱" },
-  // ── B ──
   { en: "background", ko: "배경", emoji: "🖼️" },
   { en: "badly", ko: "나쁘게", emoji: "👎" },
   { en: "bar", ko: "바/술집", emoji: "🍸" },
@@ -100,7 +98,6 @@ export const WORDS_L2 = [
   { en: "burn", ko: "타다/태우다", emoji: "🔥" },
   { en: "businessman", ko: "사업가", emoji: "👨‍💼" },
   { en: "button", ko: "버튼", emoji: "🔘" },
-  // ── C ──
   { en: "camp", ko: "캠프", emoji: "⛺" },
   { en: "camping", ko: "캠핑", emoji: "🏕️" },
   { en: "care", ko: "돌보다", emoji: "❤️" },
@@ -176,7 +173,6 @@ export const WORDS_L2 = [
   { en: "curly", ko: "곱슬곱슬한", emoji: "💇" },
   { en: "customer", ko: "고객", emoji: "🧑" },
   { en: "cycle", ko: "자전거/순환", emoji: "🚴" },
-  // ── D ──
   { en: "daily", ko: "매일의", emoji: "📅" },
   { en: "danger", ko: "위험", emoji: "⚠️" },
   { en: "data", ko: "데이터", emoji: "📊" },
@@ -217,11 +213,9 @@ export const WORDS_L2 = [
   { en: "drop", ko: "떨어뜨리다", emoji: "💧" },
   { en: "drug", ko: "약/마약", emoji: "💊" },
   { en: "dry", ko: "마른/건조한", emoji: "🏜️" },
-  // ── E ──
   { en: "earn", ko: "벌다", emoji: "💰" },
   { en: "earth", ko: "지구", emoji: "🌍" },
   { en: "easily", ko: "쉽게", emoji: "👌" },
-  { en: "eat", ko: "먹다", emoji: "🍴" },
   { en: "education", ko: "교육", emoji: "🎓" },
   { en: "effect", ko: "효과", emoji: "💫" },
   { en: "either", ko: "둘 중 하나", emoji: "🔀" },
@@ -261,7 +255,6 @@ export const WORDS_L2 = [
   { en: "expression", ko: "표현", emoji: "😊" },
   { en: "extreme", ko: "극단적인", emoji: "⚡" },
   { en: "extremely", ko: "매우", emoji: "❗" },
-  // ── F ──
   { en: "factory", ko: "공장", emoji: "🏭" },
   { en: "factor", ko: "요인", emoji: "📊" },
   { en: "fail", ko: "실패하다", emoji: "😢" },
@@ -298,7 +291,6 @@ export const WORDS_L2 = [
   { en: "fun", ko: "재미있는", emoji: "🎉" },
   { en: "furniture", ko: "가구", emoji: "🛋️" },
   { en: "further", ko: "더 먼/추가의", emoji: "➡️" },
-  // ── G ──
   { en: "gallery", ko: "갤러리", emoji: "🖼️" },
   { en: "gap", ko: "틈/격차", emoji: "↔️" },
   { en: "gas", ko: "가스/기름", emoji: "⛽" },
@@ -320,7 +312,6 @@ export const WORDS_L2 = [
   { en: "guest", ko: "손님", emoji: "🧑" },
   { en: "gun", ko: "총", emoji: "🔫" },
   { en: "guy", ko: "남자/사람", emoji: "🧑" },
-  // ── H ──
   { en: "habit", ko: "습관", emoji: "🔄" },
   { en: "hall", ko: "홀/강당", emoji: "🏛️" },
   { en: "headache", ko: "두통", emoji: "🤕" },
@@ -338,14 +329,12 @@ export const WORDS_L2 = [
   { en: "hockey", ko: "하키", emoji: "🏒" },
   { en: "hold", ko: "잡다", emoji: "🤲" },
   { en: "hole", ko: "구멍", emoji: "🕳️" },
-  { en: "home", ko: "가정", emoji: "🏠" },
   { en: "honest", ko: "정직한", emoji: "😊" },
   { en: "hope", ko: "희망하다", emoji: "🤞" },
   { en: "horrible", ko: "끔찍한", emoji: "😱" },
   { en: "huge", ko: "거대한", emoji: "🐋" },
   { en: "human", ko: "인간", emoji: "🧑" },
   { en: "hurt", ko: "다치게 하다", emoji: "🤕" },
-  // ── I ──
   { en: "identify", ko: "확인하다", emoji: "🔎" },
   { en: "ill", ko: "아픈", emoji: "🤒" },
   { en: "illness", ko: "질병", emoji: "🤒" },
@@ -376,21 +365,18 @@ export const WORDS_L2 = [
   { en: "involve", ko: "포함하다", emoji: "📦" },
   { en: "item", ko: "항목/물건", emoji: "📦" },
   { en: "itself", ko: "그 자체", emoji: "🔄" },
-  // ── J ──
   { en: "jam", ko: "잼/막힘", emoji: "🫐" },
   { en: "jazz", ko: "재즈", emoji: "🎷" },
   { en: "jewellery", ko: "보석류", emoji: "💎" },
   { en: "joke", ko: "농담", emoji: "😂" },
   { en: "journalist", ko: "기자", emoji: "📰" },
   { en: "jump", ko: "뛰다", emoji: "🦘" },
-  // ── K ──
   { en: "kid", ko: "아이", emoji: "👧" },
   { en: "kill", ko: "죽이다", emoji: "💀" },
   { en: "knee", ko: "무릎", emoji: "🦵" },
   { en: "knife", ko: "칼", emoji: "🔪" },
   { en: "knock", ko: "노크하다", emoji: "🚪" },
   { en: "knowledge", ko: "지식", emoji: "📚" },
-  // ── L ──
   { en: "lab", ko: "실험실", emoji: "🔬" },
   { en: "lady", ko: "숙녀", emoji: "👩" },
   { en: "lake", ko: "호수", emoji: "🏞️" },
@@ -422,7 +408,6 @@ export const WORDS_L2 = [
   { en: "low", ko: "낮은", emoji: "⬇️" },
   { en: "luck", ko: "행운", emoji: "🍀" },
   { en: "lucky", ko: "운 좋은", emoji: "🍀" },
-  // ── M ──
   { en: "mail", ko: "우편", emoji: "📧" },
   { en: "major", ko: "주요한", emoji: "⭐" },
   { en: "male", ko: "남성의", emoji: "♂️" },

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Alert,
   Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -30,21 +31,47 @@ export default function LevelSelectScreen({
   currentLevel,
   onBack,
   attemptHistory,
+  unlockedLevels = [1],
 }) {
-  const { showRewarded } = useAds();
+  const { showRewarded, adsRemoved } = useAds();
 
   useEffect(() => {
     logLevelSelectEnter();
   }, []);
 
   const handleSelect = (lv) => {
-    if (lv === currentLevel) {
-      // 현재 레벨 재선택 → 바로 이동
+    // Lv.1은 항상 광고 없이 진입
+    if (lv === 1) {
       onSelect(lv);
-    } else {
-      // 다른 레벨 선택 → 보상형 광고 후 이동
-      showRewarded(() => onSelect(lv));
+      return;
     }
+
+    // 광고 제거 구매한 경우 바로 이동
+    if (adsRemoved) {
+      onSelect(lv);
+      return;
+    }
+
+    // 잠긴 레벨 → 해금 안내 팝업
+    if (!unlockedLevels.includes(lv)) {
+      Alert.alert(
+        `Lv.${lv} ${LEVEL_INFO.find(l => l.level === lv)?.name || ''}`,
+        '광고를 시청하면 레벨이 열립니다!',
+        [
+          { text: '취소', style: 'cancel' },
+          {
+            text: '광고 보고 열기',
+            onPress: () => {
+              showRewarded(() => onSelect(lv));
+            },
+          },
+        ],
+      );
+      return;
+    }
+
+    // 해금된 레벨 → 보상형 광고 (쿨타임은 AdsContext에서 관리)
+    showRewarded(() => onSelect(lv));
   };
 
   const levels = LEVEL_INFO.map((l) => ({
@@ -93,6 +120,7 @@ export default function LevelSelectScreen({
 
         {levels.map((lv) => {
           const isCurrent = lv.level === currentLevel;
+          const isLocked = lv.level > 1 && !unlockedLevels.includes(lv.level) && !adsRemoved;
           const cardInner = (
             <>
               {isCurrent && (
@@ -100,22 +128,22 @@ export default function LevelSelectScreen({
                   <Text style={styles.badgeText}>현재</Text>
                 </View>
               )}
+              {isLocked && (
+                <View style={[styles.badge, { backgroundColor: '#f59e0b' }]}>
+                  <Text style={styles.badgeText}>🔒 광고 시청</Text>
+                </View>
+              )}
               <View style={styles.row1}>
-                <View style={[styles.levelPill, isCurrent && styles.levelPillOnSelected]}>
-                  <Text style={styles.levelPillText}>Lv.{lv.level}</Text>
+                <View style={[styles.levelPill, isCurrent && styles.levelPillOnSelected, isLocked && styles.levelPillLocked]}>
+                  <Text style={styles.levelPillText}>{isLocked ? '🔒' : `Lv.${lv.level}`}</Text>
                 </View>
                 <View style={styles.cardInfo}>
-                  <Text style={[styles.cardTitle, isCurrent && styles.cardTitleOnSelected]} numberOfLines={1}>
+                  <Text style={[styles.cardTitle, isCurrent && styles.cardTitleOnSelected, isLocked && styles.cardTitleLocked]} numberOfLines={1}>
                     {lv.name}
                   </Text>
                   <Text style={[styles.cardSubtitle, isCurrent && styles.cardSubtitleOnSelected]} numberOfLines={1}>
                     {lv.desc} · {lv.actual}개 단어
                   </Text>
-                  {lv.topics ? (
-                    <Text style={[styles.cardTopics, isCurrent && styles.cardTopicsOnSelected]} numberOfLines={2}>
-                      {lv.topics}
-                    </Text>
-                  ) : null}
                 </View>
               </View>
             </>
@@ -229,6 +257,12 @@ const styles = StyleSheet.create({
   },
   levelPillOnSelected: {
     backgroundColor: "rgba(255,255,255,0.2)",
+  },
+  levelPillLocked: {
+    backgroundColor: "#d1d5db",
+  },
+  cardTitleLocked: {
+    color: "#9ca3af",
   },
   badge: {
     position: "absolute",

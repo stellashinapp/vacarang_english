@@ -8,7 +8,7 @@ const ADS_REMOVED_KEY = 'adsRemoved';
 const LAST_REWARDED_KEY = 'lastRewardedTime';
 
 const INTERSTITIAL_EVERY_N = 2;        // 전면광고: 2회 플레이마다 1회
-const REWARDED_INTERVAL_MS = 60 * 1000; // 보상형 최소 간격 60초
+const AD_COOLDOWN_MS = 60 * 1000;      // 모든 광고 쿨타임 1분
 
 const AdsContext = createContext(null);
 
@@ -19,7 +19,7 @@ export function getGlobalCurrentLevel() { return _globalCurrentLevel; }
 
 export function AdsProvider({ children }) {
   const [adsRemoved, setAdsRemovedState] = useState(false);
-  const [lastRewardedTime, setLastRewardedTime] = useState(0);
+  const [lastAdTime, setLastAdTime] = useState(0);
   const playCount = useRef(0);
   const [ready, setReady] = useState(false);
   const currentLevel = useRef(1);
@@ -80,32 +80,41 @@ export function AdsProvider({ children }) {
     _globalCurrentLevel = level;
   }, []);
 
-  // 전면광고: Lv.1은 3회마다, 나머지는 2회마다
+  // 쿨타임 체크 (모든 광고 공통 1분)
+  const isCooldown = () => {
+    return Date.now() - lastAdTime < AD_COOLDOWN_MS;
+  };
+
+  const markAdShown = () => {
+    const now = Date.now();
+    setLastAdTime(now);
+    AsyncStorage.setItem(LAST_REWARDED_KEY, String(now)).catch(() => {});
+  };
+
+  // 전면광고: Lv.1은 3회마다, 나머지는 2회마다 (1분 쿨타임)
   const showInterstitial = useCallback(() => {
     if (adsRemoved) return;
+    if (isCooldown()) return; // 1분 쿨타임
     playCount.current += 1;
     const interval = currentLevel.current === 1 ? 3 : INTERSTITIAL_EVERY_N;
     if (playCount.current % interval !== 0) return;
+    markAdShown();
     try {
       const { showInterstitialAd } = require('../services/ads');
       showInterstitialAd();
     } catch (e) {}
-  }, [adsRemoved]);
+  }, [adsRemoved, lastAdTime]);
 
-  // 보상형광고: 레벨 변경 시 호출 (Lv.1은 제외)
+  // 보상형광고: 레벨 변경 시 호출 (1분 쿨타임)
   const showRewarded = useCallback((onRewarded) => {
     if (adsRemoved) { onRewarded?.(); return; }
-    // Lv.1 → 다른 레벨은 광고 없이 이동 허용 (초기 진입 장벽 제거)
-    if (currentLevel.current === 1) { onRewarded?.(); return; }
-    const now = Date.now();
-    if (now - lastRewardedTime < REWARDED_INTERVAL_MS) { onRewarded?.(); return; }
-    setLastRewardedTime(now);
-    AsyncStorage.setItem(LAST_REWARDED_KEY, String(now)).catch(() => {});
+    if (isCooldown()) { onRewarded?.(); return; } // 1분 쿨타임
+    markAdShown();
     try {
       const { showRewardedAd } = require('../services/ads');
       showRewardedAd(onRewarded);
     } catch (e) { onRewarded?.(); }
-  }, [adsRemoved, lastRewardedTime]);
+  }, [adsRemoved, lastAdTime]);
 
   return (
     <AdsContext.Provider value={{

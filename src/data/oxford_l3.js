@@ -1,4 +1,4 @@
-// Oxford 3000 - Level 3: 초중급 (A2 중반) 430개
+// Oxford 3000 - Level 3
 export const WORDS_L3 = [
   { en: "absolutely", ko: "절대적으로", emoji: "💯" },
   { en: "accommodation", ko: "숙소", emoji: "🏨" },
@@ -218,7 +218,6 @@ export const WORDS_L3 = [
   { en: "enemy", ko: "적", emoji: "😡" },
   { en: "engaged", ko: "약혼한", emoji: "💍" },
   { en: "engineering", ko: "공학", emoji: "⚙️" },
-  { en: "enormous", ko: "막대한", emoji: "🐋" },
   { en: "entertain", ko: "즐겁게 하다", emoji: "🎭" },
   { en: "entertainment", ko: "오락", emoji: "🎬" },
   { en: "entrance", ko: "입구", emoji: "🚪" },
@@ -272,7 +271,6 @@ export const WORDS_L3 = [
   { en: "folk", ko: "사람들/민속", emoji: "👥" },
   { en: "force", ko: "힘/강제하다", emoji: "💪" },
   { en: "forever", ko: "영원히", emoji: "♾️" },
-  { en: "formal", ko: "공식적인", emoji: "👔" },
   { en: "former", ko: "이전의", emoji: "⏪" },
   { en: "fortune", ko: "재산/운", emoji: "💰" },
   { en: "found", ko: "설립하다", emoji: "🏗️" },

@@ -55,8 +55,11 @@ export default function App() {
   const [gameResult, setGameResult] = useState(null);
 
   // 오답 기록 & 시도 횟수 관리
-  const [wrongWords, setWrongWords] = useState({}); // { "apple": { count: 2, word: {...} } }
-  const [attemptHistory, setAttemptHistory] = useState({}); // { "apple": { attempts: 3, correct: 1 } }
+  const [wrongWords, setWrongWords] = useState({});
+  const [attemptHistory, setAttemptHistory] = useState({});
+
+  // 해금된 레벨 (Lv.1은 항상 열림, 나머지는 광고 시청 후 해제)
+  const [unlockedLevels, setUnlockedLevels] = useState([1]);
 
   // Paperlogy 폰트 로드 (assets/fonts)
   useEffect(() => {
@@ -97,8 +100,10 @@ export default function App() {
     try {
       const wrong = await AsyncStorage.getItem("wrongWords");
       const attempts = await AsyncStorage.getItem("attemptHistory");
+      const unlocked = await AsyncStorage.getItem("unlockedLevels");
       if (wrong) setWrongWords(JSON.parse(wrong));
       if (attempts) setAttemptHistory(JSON.parse(attempts));
+      if (unlocked) setUnlockedLevels(JSON.parse(unlocked));
     } catch (e) {
       console.log("Data load error:", e);
     }
@@ -169,6 +174,13 @@ export default function App() {
     setLevel(lv);
     setGlobalCurrentLevel(lv);
     setWords(getAllWordsForLevel(lv));
+    // 해금 상태 저장
+    setUnlockedLevels(prev => {
+      if (prev.includes(lv)) return prev;
+      const next = [...prev, lv];
+      AsyncStorage.setItem("unlockedLevels", JSON.stringify(next)).catch(() => {});
+      return next;
+    });
     setScreen("menu");
   };
 
@@ -269,6 +281,7 @@ export default function App() {
           currentLevel={level}
           onBack={goHome}
           attemptHistory={attemptHistory}
+          unlockedLevels={unlockedLevels}
         />
       )}
 
