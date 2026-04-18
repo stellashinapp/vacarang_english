@@ -73,7 +73,7 @@
     "updates": {
       "url": "https://u.expo.dev/5dc97be5-abb4-444f-8aee-fa16d6821fc7"
     },
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "extra": {
       "eas": {
         "projectId": "5dc97be5-abb4-444f-8aee-fa16d6821fc7"
