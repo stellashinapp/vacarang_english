@@ -67,6 +67,7 @@ export default function RemoveAdsScreen({ onBack }) {
     const success = await purchaseRemoveAds();
     if (!success) {
       setPurchasing(false);
+      Alert.alert('준비 중', '광고 제거 구매 기능을 준비하고 있습니다.\n곧 업데이트 예정입니다!');
     }
   };
 
