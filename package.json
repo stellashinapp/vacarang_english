@@ -37,6 +37,7 @@
     "react-dom": "19.0.0",
     "react-native": "0.79.6",
     "react-native-google-mobile-ads": "^14.11.0",
+    "react-native-purchases": "^10.0.1",
     "react-native-safe-area-context": "5.4.0",
     "react-native-web": "^0.20.0"
   },
@@ -47,11 +48,15 @@
   "private": true,
   "expo": {
     "install": {
-      "exclude": ["@react-native-async-storage/async-storage"]
+      "exclude": [
+        "@react-native-async-storage/async-storage"
+      ]
     },
     "doctor": {
       "reactNativeDirectoryCheck": {
-        "exclude": ["expo-av"]
+        "exclude": [
+          "expo-av"
+        ]
       }
     }
   }
