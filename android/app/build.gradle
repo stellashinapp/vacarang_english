@@ -92,8 +92,8 @@ android {
         applicationId 'com.vacarang.english'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 13
-        versionName "1.0.11"
+        versionCode 18
+        versionName "1.0.14"
     }
     signingConfigs {
         debug {
@@ -103,7 +103,7 @@ android {
             keyPassword 'android'
         }
         release {
-            storeFile file("${projectRoot}/credentials/android/keystore.jks")
+            storeFile file("${project.rootDir}/../credentials/android/keystore.jks")
             storePassword '1a2251ede34bdb88aca13ff15a77e0f3'
             keyAlias 'ac153c8de4bc49928595f2632eff6663'
             keyPassword 'e37110a95f401fe1bca19ed1df5de293'
@@ -115,10 +115,11 @@ android {
         }
         release {
             signingConfig signingConfigs.release
-            shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             crunchPngs (findProperty('android.enablePngCrunchInReleaseBuilds')?.toBoolean() ?: true)
+            ndk { debugSymbolLevel 'SYMBOL_TABLE' }
         }
     }
     packagingOptions {
@@ -154,6 +155,7 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    implementation("com.android.billingclient:billing:7.1.1")
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";

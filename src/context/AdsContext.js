@@ -8,7 +8,7 @@ const ADS_REMOVED_KEY = 'adsRemoved';
 const LAST_REWARDED_KEY = 'lastRewardedTime';
 
 const INTERSTITIAL_EVERY_N = 2;        // 전면광고: 2회 플레이마다 1회
-const AD_COOLDOWN_MS = 60 * 1000;      // 모든 광고 쿨타임 1분
+const AD_COOLDOWN_MS = 5 * 60 * 1000;  // 모든 광고 쿨타임 5분
 
 const AdsContext = createContext(null);
 

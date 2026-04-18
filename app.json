@@ -6,7 +6,7 @@
   "expo": {
     "name": "보카랑 잉글리쉬",
     "slug": "vacarang",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -33,7 +33,7 @@
         "backgroundColor": "#F8F9FF"
       },
       "package": "com.vacarang.english",
-      "versionCode": 16,
+      "versionCode": 18,
       "permissions": ["com.android.vending.BILLING"],
       "googleServicesFile": "./google-services.json"
     },
@@ -73,7 +73,7 @@
     "updates": {
       "url": "https://u.expo.dev/5dc97be5-abb4-444f-8aee-fa16d6821fc7"
     },
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "extra": {
       "eas": {
         "projectId": "5dc97be5-abb4-444f-8aee-fa16d6821fc7"
