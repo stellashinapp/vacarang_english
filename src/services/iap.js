@@ -2,7 +2,7 @@
 import { Platform } from 'react-native';
 import Purchases from 'react-native-purchases';
 
-const REVENUECAT_ANDROID_KEY = 'goog_YOUR_REVENUECAT_API_KEY'; // RevenueCat에서 발급
+const REVENUECAT_ANDROID_KEY = 'goog_WeuLweLADOfMGvWeotVeNCAaUAp';
 const REVENUECAT_IOS_KEY = 'appl_YOUR_REVENUECAT_API_KEY';
 const PRODUCT_ID = 'remove_ads';
 
